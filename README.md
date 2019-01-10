@@ -1,12 +1,11 @@
 # Laravel Repository
 
-
 Laravel Repository is a package for Laravel 5.7 which is used to abstract the database layer. This makes applications much easier to maintain.
 
 
-**The main differnece between this and others is:**
+**The main differnece between this project and others is:**
 * use eloquent model as an entity
-* put the business logic into eloquent model
+* put business logic into eloquent model
 * always use repository to persist eloquent model, `$repository->save($model)`;
 * don't call `$model->save, $model->update, $model->delete`, etc... persistence method directly, always use `$repository->save($model)`
 
@@ -16,13 +15,13 @@ Run the following command from you terminal:
 
 
  ```bash
- composer require tlikai/laravel-repositories
+ composer require tlikai/laravel-repository
  ```
 
 or add this to require section in your composer.json file:
 
  ```
- "bosnadev/repositories": "^1.0"
+ "tlikai/repository": "^1.0"
  ```
 
 then run ```composer update```
