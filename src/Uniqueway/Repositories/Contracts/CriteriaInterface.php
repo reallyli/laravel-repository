@@ -1,15 +1,15 @@
 <?php
 
-namespace Bosnadev\Repositories\Contracts;
+namespace Uniqueway\Repositories\Contracts;
 
-use Bosnadev\Repositories\Criteria\Criteria;
+use Uniqueway\Repositories\Criteria\Criteria;
 
 /**
  * Interface CriteriaInterface
- * @package Bosnadev\Repositories\Contracts
+ * @package Uniqueway\Repositories\Contracts
  */
-interface CriteriaInterface {
-
+interface CriteriaInterface
+{
     /**
      * @param bool $status
      * @return $this
@@ -36,5 +36,5 @@ interface CriteriaInterface {
     /**
      * @return $this
      */
-    public function  applyCriteria();
+    public function applyCriteria();
 }

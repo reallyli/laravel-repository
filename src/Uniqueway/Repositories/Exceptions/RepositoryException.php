@@ -1,12 +1,11 @@
 <?php
 
-namespace Bosnadev\Repositories\Exceptions;
+namespace Uniqueway\Repositories\Exceptions;
 
 /**
  * Class RepositoryException
- * @package Bosnadev\Repositories\Exceptions
+ * @package Uniqueway\Repositories\Exceptions
  */
 class RepositoryException extends \Exception
 {
-
 }

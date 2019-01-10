@@ -1,13 +1,14 @@
-# Laravel Repositories
+# Laravel Repository
 
-[![Build Status](https://travis-ci.org/bosnadev/repository.svg?branch=master)](https://travis-ci.org/bosnadev/repository) 
-[![SensioLabsInsight](https://img.shields.io/sensiolabs/i/f39e6dc7-1364-481d-b722-8413bdc3200f.svg?style=flat)](https://insight.sensiolabs.com/projects/f39e6dc7-1364-481d-b722-8413bdc3200f)
-[![Latest Stable Version](https://poser.pugx.org/bosnadev/repositories/v/stable)](https://packagist.org/packages/bosnadev/repositories)
-[![Total Downloads](https://poser.pugx.org/bosnadev/repositories/downloads)](https://packagist.org/packages/bosnadev/repositories)
-[![Monthly Downloads](https://poser.pugx.org/bosnadev/repositories/d/monthly)](https://packagist.org/packages/bosnadev/repositories)
-[![License](https://poser.pugx.org/bosnadev/repositories/license)](https://packagist.org/packages/bosnadev/repositories)
 
-Laravel Repositories is a package for Laravel 5 which is used to abstract the database layer. This makes applications much easier to maintain.
+Laravel Repository is a package for Laravel 5.7 which is used to abstract the database layer. This makes applications much easier to maintain.
+
+
+**The main differnece between this and others is:**
+* use eloquent model as an entity
+* put the business logic into eloquent model
+* always use repository to persist eloquent model, `$repository->save($model)`;
+* don't call `$model->save, $model->update, $model->delete`, etc... persistence method directly, always use `$repository->save($model)`
 
 ## Installation
 
@@ -15,13 +16,13 @@ Run the following command from you terminal:
 
 
  ```bash
- composer require "bosnadev/repositories: 0.*"
+ composer require tlikai/laravel-repositories
  ```
 
 or add this to require section in your composer.json file:
 
  ```
- "bosnadev/repositories": "0.*"
+ "bosnadev/repositories": "^1.0"
  ```
 
 then run ```composer update```
@@ -29,13 +30,13 @@ then run ```composer update```
 
 ## Usage
 
-First, create your repository class. Note that your repository class MUST extend ```Bosnadev\Repositories\Eloquent\Repository``` and implement model() method
+First, create your repository class. Note that your repository class MUST extend ```Uniqueway\Repositories\Eloquent\Repository``` and implement model() method
 
 ```php
 <?php namespace App\Repositories;
 
-use Bosnadev\Repositories\Contracts\RepositoryInterface;
-use Bosnadev\Repositories\Eloquent\Repository;
+use Uniqueway\Repositories\Contracts\RepositoryInterface;
+use Uniqueway\Repositories\Eloquent\Repository;
 
 class FilmsRepository extends Repository {
 
@@ -90,23 +91,23 @@ class FilmsController extends Controller {
 
 The following methods are available:
 
-##### Bosnadev\Repositories\Contracts\RepositoryInterface
+##### Uniqueway\Repositories\Contracts\RepositoryInterface
 
 ```php
 public function all($columns = array('*'))
 public function lists($value, $key = null)
-public function paginate($perPage = 1, $columns = array('*'));
-public function create(array $data)
-// if you use mongodb then you'll need to specify primary key $attribute
-public function update(array $data, $id, $attribute = "id")
-public function delete($id)
+public function paginate($perPage = 1, $columns = array('*'))
+public function save($model)
+public function delete($model)
 public function find($id, $columns = array('*'))
 public function findBy($field, $value, $columns = array('*'))
 public function findAllBy($field, $value, $columns = array('*'))
 public function findWhere($where, $columns = array('*'))
+public function findWhereIn($field, $values, $columns = ['*'])
+public function whereHas($relation, $closure)
 ```
 
-##### Bosnadev\Repositories\Contracts\CriteriaInterface
+##### Uniqueway\Repositories\Contracts\CriteriaInterface
 
 ```php
 public function apply($model, Repository $repository)
@@ -114,50 +115,49 @@ public function apply($model, Repository $repository)
 
 ### Example usage
 
-
-Create a new film in repository:
-
-```php
-$this->film->create(Input::all());
-```
-
-Update existing film:
-
-```php
-$this->film->update(Input::all(), $film_id);
-```
-
-Delete film:
-
-```php
-$this->film->delete($id);
-```
-
-Find film by film_id;
+Find film by id;
 
 ```php
 $this->film->find($id);
 ```
 
-you can also chose what columns to fetch:
+Create a new film:
 
 ```php
-$this->film->find($id, ['title', 'description', 'release_date']);
+$film = new Film;
+$film->fill($attributes);
+$this->film->save($film);
 ```
 
-Get a single row by a single column criteria.
+Update existing film:
+
+```php
+$film = $this->film->find($id);
+$film->fill($attributes);
+$this->film->save($film);
+```
+
+Delete film:
+
+```php
+$film = $this->film->find($id);
+$this->film->delete($film);
+```
+
+```
+
+Find one film by column
 
 ```php
 $this->film->findBy('title', $title);
 ```
 
-Or you can get all rows by a single column criteria.
+Find all film by column
 ```php
 $this->film->findAllBy('author_id', $author_id);
 ```
 
-Get all results by multiple fields
-
+Get all rows by multiple fields
 ```php
 $this->film->findWhere([
     'author_id' => $author_id,
@@ -165,17 +165,63 @@ $this->film->findWhere([
 ]);
 ```
 
+Put domain logic into model, use repository perist it
+```php
+<?php namespace App;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Film extends Model {
+
+    protected $primaryKey = 'film_id';
+
+    protected $table = 'film';
+
+    protected $casts = [
+        "rental_rate"       => 'float'
+    ];
+
+    public function publish()
+    {
+        $this->status = 'publish';
+    }
+}
+?>
+
+<?php namespace App\Http\Controllers;
+
+use App\Repositories\FilmsRepository as Film;
+
+class FilmsController extends Controller {
+
+    private $film;
+
+    public function __construct(Film $film) {
+
+        $this->film = $film;
+    }
+
+    public function markAsPublish(Request $request, $id) {
+        $film = $this->film->find($id);
+        $film->publish();
+        $this->film->save($film);
+        return \Response::ok();
+    }
+}
+?>
+```
+
 ## Criteria
 
-Criteria is a simple way to apply specific condition, or set of conditions to the repository query. Your criteria class MUST extend the abstract ```Bosnadev\Repositories\Criteria\Criteria``` class.
+Criteria is a simple way to apply specific condition, or set of conditions to the repository query. Your criteria class MUST extend the abstract ```Uniqueway\Repositories\Criteria\Criteria``` class.
 
 Here is a simple criteria:
 
 ```php
 <?php namespace App\Repositories\Criteria\Films;
 
-use Bosnadev\Repositories\Criteria\Criteria;
-use Bosnadev\Repositories\Contracts\RepositoryInterface as Repository;
+use Uniqueway\Repositories\Criteria\Criteria;
+use Uniqueway\Repositories\Contracts\RepositoryInterface as Repository;
 
 class LengthOverTwoHours extends Criteria {
 
@@ -220,6 +266,7 @@ class FilmsController extends Controller {
 ```
 
 
-## Credits
+## Inspired by
 
-This package is largely inspired by [this](https://github.com/prettus/l5-repository) great package by @andersao. [Here](https://github.com/anlutro/laravel-repository/) is another package I used as reference.
+* [prettus/l5-repository](https://github.com/prettus/l5-repository)
+* [bosnadev/repository](https://github.com/bosnadev/repository)
