@@ -143,7 +143,7 @@ abstract class Repository implements RepositoryInterface, CriteriaInterface
     {
         $this->applyCriteria();
 
-        return $this->model->find($id, $columns);
+        return $this->model->findOrFail($id, $columns);
     }
 
     /**
