@@ -21,7 +21,6 @@ class FuzzySearch extends Criteria
     protected $attributes;
 
     /**
-     * SearchCustomer constructor.
      *
      * @param string $query
      * @param array $attributes

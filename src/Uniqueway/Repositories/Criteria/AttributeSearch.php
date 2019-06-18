@@ -14,12 +14,13 @@ class AttributeSearch extends Criteria
     protected $params;
 
     /**
-     * SearchCustomer constructor.
      * @param $params
      */
     public function __construct($params)
     {
-        $this->params = collect($params);
+        $this->params = collect($params)->filter(function ($param) {
+            return ! is_null($param);
+        });
     }
 
     /**
@@ -29,14 +30,8 @@ class AttributeSearch extends Criteria
      */
     public function apply($model, Repository $repository)
     {
-        $model = $model;
         foreach ($this->params as $key => $val) {
             list($attribute, $operator, $value) = $this->extractFactors($key, $val);
-
-            // 过滤掉空数据
-            if (empty($value)) {
-                continue;
-            }
 
             $model = $model->where($attribute, $operator, $value);
         }
