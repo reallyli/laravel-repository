@@ -152,7 +152,7 @@ abstract class Repository implements RepositoryInterface, CriteriaInterface
      * @param array $columns
      * @return mixed
      */
-    public function findBy($attribute, $value, $columns = ['*'])
+    public function findBy($attribute, $value = '', $columns = ['*'])
     {
         $this->applyCriteria();
 
