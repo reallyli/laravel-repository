@@ -147,6 +147,19 @@ abstract class Repository implements RepositoryInterface, CriteriaInterface
     }
 
     /**
+     * @param array $where
+     * @param array $columns
+     * @return mixed
+     * @author Taylor <boz14676@gmail.com>
+     */
+    public function findByWhere(array $where, array $columns = ['*'])
+    {
+        $this->applyCriteria();
+
+        return $this->model->where($where)->first($columns);
+    }
+
+    /**
      * @param $attribute
      * @param $value
      * @param array $columns
