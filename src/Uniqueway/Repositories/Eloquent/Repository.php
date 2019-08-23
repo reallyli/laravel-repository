@@ -157,9 +157,8 @@ abstract class Repository implements RepositoryInterface, CriteriaInterface
         $this->applyCriteria();
 
         if (is_array($attribute)) {
-            $this->model->where($attribute)->first($columns);
+            return $this->model->where($attribute)->first($columns);
         }
-
 
         return $this->model->where($attribute, '=', $value)->first($columns);
     }
