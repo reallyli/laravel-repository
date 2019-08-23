@@ -43,12 +43,12 @@ interface RepositoryInterface
     public function find($id, $columns = ['*']);
 
     /**
-     * @param $field
+     * @param $attribute
      * @param $value
      * @param array $columns
      * @return mixed
      */
-    public function findBy($field, $value, $columns = ['*']);
+    public function findBy($attribute, $value = '', $columns = ['*']);
 
     /**
      * @param $field
