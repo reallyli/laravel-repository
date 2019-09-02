@@ -152,49 +152,15 @@ abstract class Repository implements RepositoryInterface, CriteriaInterface
      * @param array $columns
      * @return mixed
      */
-    /**
-     * @param $attribute
-     * @param string $value
-     * @param array $columns
-     * @param bool $or
-     * @return mixed
-     * @author Taylor <boz14676@gmail.com>
-     */
-    public function findBy($attribute, $value = '', $columns = ['*'], $or = false)
+    public function findBy($attribute, $value = '', $columns = ['*'])
     {
         $this->applyCriteria();
 
-        $model = $this->model;
-
         if (is_array($attribute)) {
-            foreach ($attribute as $field => $value) {
-                if ($value instanceof \Closure) {
-                    $model = (!$or)
-                        ? $model->where($value)
-                        : $model->orWhere($value);
-                } elseif (is_array($value)) {
-                    if (count($value) === 3) {
-                        list($field, $operator, $search) = $value;
-                        $model = (!$or)
-                            ? $model->where($field, $operator, $search)
-                            : $model->orWhere($field, $operator, $search);
-                    } elseif (count($value) === 2) {
-                        list($field, $search) = $value;
-                        $model = (!$or)
-                            ? $model->where($field, '=', $search)
-                            : $model->orWhere($field, '=', $search);
-                    }
-                } else {
-                    $model = (!$or)
-                        ? $model->where($field, '=', $value)
-                        : $model->orWhere($field, '=', $value);
-                }
-            }
-
-            return $model->first($columns);
+            return $this->model->where($attribute)->first($columns);
         }
 
-        return $model->where($attribute, '=', $value)->first($columns);
+        return $this->model->where($attribute, '=', $value)->first($columns);
     }
 
     /**

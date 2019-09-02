@@ -44,13 +44,11 @@ interface RepositoryInterface
 
     /**
      * @param $attribute
-     * @param string $value
+     * @param $value
      * @param array $columns
-     * @param bool $or
      * @return mixed
-     * @author Taylor <boz14676@gmail.com>
      */
-    public function findBy($attribute, $value = '', $columns = ['*'], $or = false);
+    public function findBy($attribute, $value = '', $columns = ['*']);
 
     /**
      * @param $field
