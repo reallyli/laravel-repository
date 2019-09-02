@@ -44,18 +44,15 @@ class FuzzySearch extends Criteria
             return $model;
         }
 
-        $where = 'where';
-        foreach ($this->attributes as $attribute) {
-            if ($attribute == 'id' && preg_match('/^\d+$/', $this->query)) {
-                $model = $model->$where($attribute, '=', $this->query);
-            } else {
-                $pattern = '%' . $this->query . '%';
-                $model = $model->$where($attribute, 'LIKE', $pattern);
+        return $model->where(function ($query) {
+            foreach ($this->attributes as $attribute) {
+                if ($attribute == 'id' && preg_match('/^\d+$/', $this->query)) {
+                    $query->orWhere($attribute, '=', $this->query);
+                } else {
+                    $pattern = '%' . $this->query . '%';
+                    $query->orWhere($attribute, 'LIKE', $pattern);
+                }
             }
-
-            $where = 'orWhere';
-        }
-
-        return $model;
+        });
     }
 }
